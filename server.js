@@ -136,7 +136,16 @@ async function processWithN8N(data) {
 }
 
 app.get('/health', (req, res) => {
+    console.log('Health check solicitado');
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'Retell AI Bridge funcionando correctamente',
+        status: 'ok',
+        timestamp: new Date().toISOString()
+    });
 });
 
 app.post('/webhook/retell', express.json(), (req, res) => {
@@ -172,8 +181,20 @@ process.on('SIGINT', () => {
     });
 });
 
+server.on('error', (error) => {
+    console.error('Server error:', error);
+});
+
+console.log('Intentando iniciar servidor...');
+
 server.listen(PORT, () => {
     console.log(`Servidor ejecutándose en puerto ${PORT}`);
     console.log(`WebSocket endpoint: ws://localhost:${PORT}/ws/{call_id}`);
     console.log(`Health endpoint: http://localhost:${PORT}/health`);
+    console.log('Todas las configuraciones cargadas correctamente');
+    console.log('Environment variables:');
+    console.log(`- PORT: ${process.env.PORT}`);
+    console.log(`- NODE_ENV: ${process.env.NODE_ENV}`);
+    console.log(`- N8N_WEBHOOK_URL: ${process.env.N8N_WEBHOOK_URL}`);
+    console.log('Servidor listo para recibir conexiones');
 });
