@@ -146,7 +146,34 @@ app.post('/webhook/retell', express.json(), (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
+// Manejo de errores globales
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// Manejo de señales de terminación
+process.on('SIGTERM', () => {
+    console.log('Recibida señal SIGTERM, cerrando servidor...');
+    server.close(() => {
+        console.log('Servidor cerrado correctamente');
+        process.exit(0);
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('Recibida señal SIGINT, cerrando servidor...');
+    server.close(() => {
+        console.log('Servidor cerrado correctamente');
+        process.exit(0);
+    });
+});
+
 server.listen(PORT, () => {
     console.log(`Servidor ejecutándose en puerto ${PORT}`);
     console.log(`WebSocket endpoint: ws://localhost:${PORT}/ws/{call_id}`);
+    console.log(`Health endpoint: http://localhost:${PORT}/health`);
 });
