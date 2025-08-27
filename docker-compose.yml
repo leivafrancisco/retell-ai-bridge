@@ -1,15 +1,16 @@
 version: '3.8'
 
 services:
-  retell-bridge:
+  retell-dental-llm:
     build: .
     ports:
       - "3000:3000"
     environment:
       - PORT=3000
-      - RETELL_API_KEY=key_1a1a1708db5526852b627eada45d
-      - N8N_WEBHOOK_URL=https://n8n-n8n.nhuls8.easypanel.host/webhook/clinica-dental
       - NODE_ENV=production
+      - RETELL_API_KEY=${RETELL_API_KEY}
+      - OPENAI_APIKEY=${OPENAI_APIKEY}
+      - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
@@ -17,3 +18,8 @@ services:
       timeout: 3s
       retries: 3
       start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.retell-dental.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.retell-dental.tls=true"
+      - "traefik.http.routers.retell-dental.tls.certresolver=letsencrypt"
